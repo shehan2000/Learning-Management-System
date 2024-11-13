@@ -11,7 +11,10 @@ yarn dev
 pnpm dev
 # or
 bun dev
+# library for designing charts
+npm i recharts 
 ```
+ 
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
