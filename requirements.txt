@@ -1,0 +1,2 @@
+npm i react-calendar
+npm install recharts
