@@ -88,7 +88,11 @@ const ExamListPage = async({
             query.lesson={teacherId:value};
             break;
         case "search":
-          query.lesson = { subject: { name: { contains: value, mode: "insensitive" } } };
+          query.OR = [
+            { lesson: { subject: { name: { contains: value, mode: "insensitive" } } } },
+            { lesson: { teacher: { name: { contains: value, mode: "insensitive" } } } }
+          ];
+          
           break; 
         default:
             break;    
