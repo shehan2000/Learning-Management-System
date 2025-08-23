@@ -1,0 +1,6 @@
+npm i react-calendar
+npm install recharts
+npm i react-big-calendar
+npm i --save-dev @types/react-big-calendar
+npm i moment
+npm install @hookform/resolvers
