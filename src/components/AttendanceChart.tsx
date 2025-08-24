@@ -12,26 +12,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
+
+
+const AttendanceChart = ({present,absent}:{present:number[],absent:number[]}) => {
+  const data = [
   {
     name: "Mon",
-    present: 60,
-    absent: 40,
+    present: present[0]?present[0]:0,
+    absent: absent[0]?absent[0]:0,
   },
   {
     name: "Tue",
-    present: 70,
-    absent: 60,
+    present: present[1]?present[1]:1,
+    absent: absent[1]?absent[1]:1,
   },
   {
     name: "Wed",
-    present: 90,
-    absent: 75,
+    present: present[2]?present[2]:2,
+    absent: absent[2]?absent[2]:2,
   },
   {
     name: "Thu",
-    present: 90,
-    absent: 75,
+    present: present[3]?present[3]:3,
+    absent: absent[3]?absent[3]:3,
   },
   {
     name: "Fri",
@@ -39,14 +42,8 @@ const data = [
     absent: 55,
   },
 ];
-
-const AttendanceChart = () => {
   return (
-    <div className="bg-white rounded-lg p-4 h-full">
-      <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Attendance</h1>
-        <Image src="/moreDark.png" alt="" width={20} height={20} />
-      </div>
+    
       <ResponsiveContainer width="100%" height="90%">
         <BarChart width={500} height={300} data={data} barSize={20}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ddd" />
@@ -79,7 +76,7 @@ const AttendanceChart = () => {
           />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    
   );
 };
 

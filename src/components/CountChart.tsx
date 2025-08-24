@@ -12,6 +12,7 @@ import {
 
 
 const CountChart = ({boys,girls}:{boys:number,girls:number}) => {
+  
   const data = [
   {
     name: "Total",
