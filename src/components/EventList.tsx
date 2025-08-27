@@ -1,29 +1,57 @@
 import { prisma } from "@/lib/prisma";
 
+const EventList = async ({ dateParam }: { dateParam: string | undefined }) => {
+  // parse dateParam (expected format: yyyy-mm-dd) into local start and end
+  let start: Date;
 
-const EventList = async({dateParam}:{dateParam:string | undefined}) => {
-    const date =dateParam ? new Date(dateParam) : new Date();
-    
-    const data=await prisma.event.findMany({
-        where:{
-            startTime:{
-                gte: new Date(date.setHours(0, 0, 0, 0)),
-                lt: new Date(date.setHours(23, 59, 59, 999)),
-            }
-        }
-    })
-    return ((data.map((event) => (
-          <div
-            className="p-5 rounded-md border-2 border-gray-100 border-t-4 odd:border-t-lamaSky even:border-t-lamaPurple"
-            key={event.id}
-          >
-            <div className="flex items-center justify-between">
-              <h1 className="font-semibold text-gray-600">{event.title}</h1>
-              <span className="text-gray-300 text-xs">{event.time}</span>
-            </div>
-            <p className="mt-2 text-gray-400 text-sm">{event.description}</p>
-          </div>
-        )))
-  )}
+  if (dateParam) {
+    const parts = dateParam.split("-").map(Number);
+    const [y, m, d] = parts;
+    // create local midnight for the given date
+    start = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+  } else {
+    const now = new Date();
+    start = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+  }
+  const end = new Date(start);
+  end.setDate(start.getDate() + 1);
+  // console.log(start,end)
 
-export default EventList
+  const data = await prisma.event.findMany({
+    where: {
+      startTime: {
+        gte: start,
+        lt: end,
+      },
+    },
+    orderBy: { startTime: "asc" },
+  });
+  return data.map((event) => (
+    <div
+      className="p-5 rounded-md border-2 border-gray-100 border-t-4 odd:border-t-lamaSky even:border-t-lamaPurple"
+      key={event.id}
+    >
+      <div className="flex items-center justify-between">
+        <h1 className="font-semibold text-gray-600">{event.title}</h1>
+        <span className="text-gray-300 text-xs">
+          {event.startTime.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })}
+        </span>
+      </div>
+      <p className="mt-2 text-gray-400 text-sm">{event.description}</p>
+    </div>
+  ));
+};
+
+export default EventList;

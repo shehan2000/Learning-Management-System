@@ -1,8 +1,7 @@
 "use client";
 
-
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
@@ -33,21 +32,43 @@ const events = [
 ];
 
 const EventCalendar = () => {
-  const [value, onChange] = useState<Value>(new Date());
+  const [value, onChange] = useState<Value>(() => {
+    if (typeof window === "undefined") return new Date();
+    const dateParam = new URLSearchParams(window.location.search).get("date");
+    if (dateParam) {
+      const parts = dateParam.split("-").map(Number);
+      const [y, m, d] = parts;
+      if (y && m && d) return new Date(y, m - 1, d);
+    }
+    return new Date();
+  });
 
-  const router = useRouter()
-  useEffect(()=>{
-   if(value instanceof Date){
-     router.push(`/?date=${value.toLocaleDateString('en-US')}`)
-   }
+  function formatLocalYMD(d: Date) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
 
-  },[value,router])
-  return (
+  const router = useRouter();
 
-
-        <Calendar onChange={onChange} value={value}/>
-
-  );
+  useEffect(() => {
+    if (!(value instanceof Date) || typeof window === "undefined") return;
+    const newDate = formatLocalYMD(value);
+    const url = new URL(window.location.href);
+    const currentDate = url.searchParams.get("date");
+    url.searchParams.set("date", newDate);
+    const target = url.pathname + url.search + url.hash;
+    const current =
+      window.location.pathname + window.location.search + window.location.hash;
+    if (newDate && currentDate !== newDate && target !== current) {
+      // use router.replace to trigger server-side re-render via App Router
+      router.replace(target);
+    }
+    // intentionally only depend on value
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+  return <Calendar onChange={onChange} value={value} />;
 };
 
 export default EventCalendar;
