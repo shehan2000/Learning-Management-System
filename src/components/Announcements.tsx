@@ -8,22 +8,52 @@ const Announcements = async () => {
   // console.log("role", role);
   // console.log("sessionClaims", sessionClaims?.metadata as { role?: string });
 
-  const roleConditions={
-    teacher:{lessons:{some:{teacherId:userId!}}},
-    student:{students:{some:{studentId:userId!}}},
-    parent:{students:{some:{parentId:userId}}},
-  }
-  const data= await prisma.announcement.findMany({
-    take:3,
-    orderBy:{ date:"desc"},
-    where: {
-      ...(role!=="admin" && {
-        OR:[
-          {classId:null},
-          {class:roleConditions[role as keyof typeof roleConditions]||{}},
-        ],
-      }),
+  const roleConditions = {
+    teacher: {
+      class: {
+        is: {
+          lessons: {
+            some: {
+              teacherId: userId!,
+            },
+          },
+        },
+      },
     },
+    student: {
+      class: {
+        is: {
+          students: {
+            some: {
+              id: userId!,
+            },
+          },
+        },
+      },
+    },
+    parent: {
+      class: {
+        is: {
+          students: {
+            some: {
+              parentId: userId || undefined,
+            },
+          },
+        },
+      },
+    },
+  };
+  const data = await prisma.announcement.findMany({
+    take: 3,
+    orderBy: { date: "desc" },
+    where: role === "admin"
+      ? {}
+      : {
+          OR: [
+            { classId: null },
+            roleConditions[role as keyof typeof roleConditions] || {},
+          ],
+        },
   });
     return (
       <div className="bg-white p-4 rounded-md">
