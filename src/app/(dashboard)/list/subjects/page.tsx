@@ -2,9 +2,10 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { role, subjectsData } from "@/lib/data";
+
 import { prisma } from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
+import { getUserRole } from "@/lib/utils";
 import { Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
 
@@ -30,7 +31,13 @@ const columns = [
     accessor: "action",
   },
 ];
-const renderRow = (item: SubjectList) => (
+
+
+const SubjectListPage = async({searchParams}:{searchParams:{[key:string]:string|undefined}
+} )=> {
+
+  const role= await getUserRole();
+  const renderRow = (item: SubjectList) => (
   console.log(item),
   <tr
     key={item.id}
@@ -50,9 +57,6 @@ const renderRow = (item: SubjectList) => (
     </td>
   </tr>
 );
-
-const SubjectListPage = async({searchParams}:{searchParams:{[key:string]:string|undefined}
-} )=> {
   console.log(searchParams);  
   const {page, ...queryParams}= searchParams
   const p=page ?parseInt(page) : 1;
@@ -113,7 +117,7 @@ const SubjectListPage = async({searchParams}:{searchParams:{[key:string]:string|
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="teacher" type="create" />}
+            {role === "admin" && <FormModal table="subject" type="create" />}
           </div>
         </div>
       </div>
