@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import BigCalendar from "./BigCalender"
 import { convertUTCToLocalDate } from "@/lib/utils"
+import { adjustScheduleToCurrentWeek } from "@/lib/utils";
+
 
 
 
@@ -24,12 +26,13 @@ const BigCalendarContainer = async({
         end: convertUTCToLocalDate(lesson.endTime),
 
     }))
-    console.log(data)
-    console.log(data.map(item=>({start:item.start})))
+    // console.log(data)
+    // console.log(data.map(item=>({start:item.start})))
+    const schedule=adjustScheduleToCurrentWeek(data);
 
 
     return (
-    <div><BigCalendar data={data}/></div>
+    <div><BigCalendar data={schedule}/></div>
   )
 }
 

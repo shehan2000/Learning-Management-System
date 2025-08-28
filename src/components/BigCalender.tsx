@@ -15,9 +15,11 @@ const BigCalendar = ({data}:{data:{title:string,start:Date,end:Date}[]}) => {
   const handleOnChangeView = (selectedView: View) => {
     setView(selectedView);
   };
- console.log("data in calendar",data)
- console.log("Date:", data[0].start.toString());     // should show local time
-console.log("ISO:", data[0].start.toISOString());
+//  console.log("data in calendar",data)
+//  console.log("Date:", data[0].start.toString());     // should show local time
+// console.log("ISO:", data[0].start.toISOString());
+
+
 
   return (
     <Calendar
