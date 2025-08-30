@@ -2,7 +2,9 @@
 const nextConfig = {
     images: {
         remotePatterns:[
-            {hostname:"images.pexels.com"}
+            { hostname: "images.pexels.com" },
+            // allow Cloudinary-hosted images
+            { protocol: 'https', hostname: 'res.cloudinary.com', port: '', pathname: '/**' }
         ]
     }
 };

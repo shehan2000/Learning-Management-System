@@ -59,7 +59,7 @@ const TeacherForm = ({
 
   const onSubmit = handleSubmit((data) => {
     console.log(data);
-    formAction(data);
+    formAction({...data,img:img?.secure_url});
   });
   const router=useRouter();
     useEffect(()=>{
@@ -157,8 +157,8 @@ const TeacherForm = ({
             {...register("sex")}
             defaultValue={data?.sex}
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="MALE">MALE</option>
+            <option value="FEMALE">FEMALE</option>
           </select>
           {errors.sex?.message && (
             <p className="text-xs text-red-400">
@@ -217,6 +217,7 @@ const TeacherForm = ({
     );
   }}
 </CldUploadWidget>
+{state.error && (<span className="text-red-500">Something Went Wrong!</span>)}
       </div>
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}

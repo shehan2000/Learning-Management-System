@@ -1,193 +1,242 @@
-"use server"
+"use server";
 
 import { clerkClient } from "@clerk/nextjs/server";
-import { ClassSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
+import {
+  ClassSchema,
+  SubjectSchema,
+  TeacherSchema,
+} from "./formValidationSchemas";
 import { prisma } from "./prisma";
 
-type CurrentState={success:boolean,error:boolean}
-export const createSubject = async (currentState:CurrentState,data: SubjectSchema) => {
-  console.log(data.name+"in the server action")
+type CurrentState = {
+  success: boolean;
+  error: boolean;
+  message?: string;
+  code?: string | null;
+};
+export const createSubject = async (
+  currentState: CurrentState,
+  data: SubjectSchema
+) => {
+  console.log(data.name + "in the server action");
   try {
     await prisma.subject.create({
-        data:{
-            name:data.name,
-            teachers:{
-                connect:data.teachers.map(teacherId=>({id:teacherId})) 
-            }
-
-        }
-
+      data: {
+        name: data.name,
+        teachers: {
+          connect: data.teachers.map((teacherId) => ({ id: teacherId })),
+        },
+      },
     });
     // revalidatePath("/list/subjects")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const updateSubject = async (currentState:CurrentState,data: SubjectSchema) => {
-  console.log(data.name+"in the server action")
+export const updateSubject = async (
+  currentState: CurrentState,
+  data: SubjectSchema
+) => {
+  console.log(data.name + "in the server action");
   try {
     await prisma.subject.update({
-        where:{
-            id:data.id
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        teachers: {
+          set: data.teachers.map((teacherId) => ({ id: teacherId })),
         },
-        data:{
-            name:data.name,
-            teachers:{
-                set:data.teachers.map(teacherId=>({id:teacherId})) 
-            }
-
-        }
-
+      },
     });
     // revalidatePath("/list/subjects")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const deleteSubject = async (currentState:CurrentState,data: FormData) => {
-  const id=data.get("id") as string
+export const deleteSubject = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
   try {
     await prisma.subject.delete({
-        where:{
-            id:parseInt(id),
-        },
+      where: {
+        id: parseInt(id),
+      },
     });
     // revalidatePath("/list/subjects")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const createClass = async (currentState:CurrentState,data: ClassSchema) => {
+export const createClass = async (
+  currentState: CurrentState,
+  data: ClassSchema
+) => {
   console.log(JSON.stringify(data), "in the server action");
   try {
     await prisma.class.create({
-        data 
-
+      data,
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const updateClass = async (currentState:CurrentState,data: ClassSchema) => {
-  console.log(data.name+"in the server action")
+export const updateClass = async (
+  currentState: CurrentState,
+  data: ClassSchema
+) => {
+  console.log(data.name + "in the server action");
   try {
     await prisma.class.update({
-        where:{
-            id:data.id
-        },
-        data:{
-            name:data.name,
-            capacity:data.capacity,
-            gradeId:data.gradeId,
-            supervisorId:data.supervisorId
-        }
-
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        capacity: data.capacity,
+        gradeId: data.gradeId,
+        supervisorId: data.supervisorId,
+      },
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const deleteClass = async (currentState:CurrentState,data: FormData) => {
-  const id=data.get("id") as string
+export const deleteClass = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
   try {
     await prisma.class.delete({
-        where:{
-            id:parseInt(id),
-        },
+      where: {
+        id: parseInt(id),
+      },
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const createTeacher = async (currentState:CurrentState,data: TeacherSchema) => {
+export const createTeacher = async (
+  currentState: CurrentState,
+  data: TeacherSchema
+) => {
   console.log(JSON.stringify(data), "in the server action");
   try {
+    // clerkClient is an async initializer; await it to get the client instance
+    const client = await clerkClient();
 
-    // const client = await clerkClient();
-    // const user = await client.users.createUser({
-    //   username: data.username,
-    //   password: data.password,
-    //   firstName: data.name,
-    //   lastName: data.surname
-    // });
-    // await client.users.updateUserMetadata(user.id, {
-    //   publicMetadata: { role: "teacher" }
-    // });
+    // Create the user in Clerk first. If this fails (for example the password
+    // has been found in a data breach), catch the error below and return a
+    // structured response so the server action does not throw an unhandled
+    // exception to the Next.js renderer.
+    let user;
+    try {
+      user = await client.users.createUser({
+        username: data.username,
+        password: data.password,
+        firstName: data.name,
+        lastName: data.surname,
+      });
+    } catch (err: any) {
+      // Don't log the entire error object (it prints the stack). Extract a
+      // concise code and message to return to the caller so the UI can show
+      // a friendly error without spamming the server logs with stacks.
+      const code = err?.errors?.[0]?.code ?? null;
+      const message =
+        err?.errors?.[0]?.message ?? err?.message ?? "Failed to create user";
+      console.error("Clerk createUser failed:", code ?? message);
+      return { success: false, error: true, code, message } as any;
+    }
+
+    // Update metadata and then create the teacher record in our database.
+    await client.users.updateUserMetadata(user.id, {
+      publicMetadata: { role: "teacher" },
+    });
     await prisma.teacher.create({
-        data 
-
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        image: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        subjects: {
+          connect: data.subjects?.map((subjectId: string) => ({
+            id: parseInt(subjectId),
+          })),
+        },
+      },
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    // Outer catch: ensure we return a structured failure. If the error has a
+    // message, include it so the caller can surface it.
+    const message = (err as any)?.message ?? "Unknown server error";
+    console.error("createTeacher outer error:", message);
+    return { success: false, error: true, message } as any;
   }
 };
-export const updateTeacher = async (currentState:CurrentState,data: TeacherSchema) => {
-  console.log(data.name+"in the server action")
+export const updateTeacher = async (
+  currentState: CurrentState,
+  data: TeacherSchema
+) => {
+  console.log(data.name + "in the server action");
   try {
     await prisma.teacher.update({
-        where:{
-            id:data.id
-        },
-        data:{
-            name:data.name,
-        }
-
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+      },
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
-export const deleteTeacher = async (currentState:CurrentState,data: FormData) => {
-  const id=data.get("id") as string
+export const deleteTeacher = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
   try {
     await prisma.teacher.delete({
-        where:{
-            id:id,
-        },
+      where: {
+        id: id,
+      },
     });
     // revalidatePath("/list/class")
-    return {success:true,error:false}
-    
+    return { success: true, error: false };
   } catch (err) {
-    console.log(err)
-    return {success:false,error:true}
-
+    console.log(err);
+    return { success: false, error: true };
   }
 };
