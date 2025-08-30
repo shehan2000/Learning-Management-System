@@ -207,12 +207,63 @@ export const updateTeacher = async (
 ) => {
   console.log(data.name + "in the server action");
   try {
+    const client = await clerkClient();
+
+    // Create the user in Clerk first. If this fails (for example the password
+    // has been found in a data breach), catch the error below and return a
+    // structured response so the server action does not throw an unhandled
+    // exception to the Next.js renderer.
+    let user;
+    if (!data.id) {
+      return {
+        success: false,
+        error: true,
+        message: "User ID is required for update",
+      } as any;
+    }
+    try {
+      user = await client.users.updateUser(data.id, {
+        username: data.username,
+        ...(data.password !== "" && { password: data.password }),
+        firstName: data.name,
+        lastName: data.surname,
+      });
+    } catch (err: any) {
+      // Don't log the entire error object (it prints the stack). Extract a
+      // concise code and message to return to the caller so the UI can show
+      // a friendly error without spamming the server logs with stacks.
+      const code = err?.errors?.[0]?.code ?? null;
+      const message =
+        err?.errors?.[0]?.message ?? err?.message ?? "Failed to create user";
+      console.error("Clerk createUser failed:", code ?? message);
+      return { success: false, error: true, code, message } as any;
+    }
+
+    // Update metadata and then create the teacher record in our database.
+    await client.users.updateUserMetadata(user.id, {
+      publicMetadata: { role: "teacher" },
+    });
     await prisma.teacher.update({
-      where: {
-        id: data.id,
-      },
+      where: { id: data.id || "" },
       data: {
+        // Password is managed by Clerk; do not send it to Prisma (no column).
+        username: data.username,
         name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        image: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        subjects: {
+          // Replace the subjects relation with the provided list (empty -> none)
+          set:
+            data.subjects?.map((subjectId: string) => ({
+              id: parseInt(subjectId),
+            })) ?? [],
+        },
       },
     });
     // revalidatePath("/list/class")
