@@ -1,3 +1,4 @@
+import FormContainer from "@/components/FormContainer";
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
@@ -5,6 +6,8 @@ import TableSearch from "@/components/TableSearch";
 import { role, studentsData } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
+import { getUserId, getUserRole } from "@/lib/utils";
+
 import { Class, Prisma, Student, Subject } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -99,6 +102,10 @@ const StudentListPage = async({
   }:{
     searchParams:{[key:string]:string|undefined};
   }) => {
+
+
+    const role = await getUserRole();
+    const currentUserId = await getUserId();
     // console.log(searchParams)
     // console.log(searchParams.page)
     const {page, ...queryParams}= searchParams
@@ -167,7 +174,7 @@ const StudentListPage = async({
               // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               //   <Image src="/plus.png" alt="" width={14} height={14} />
               // </button>
-              <FormModal table="student" type="create"/>
+              <FormContainer table="student" type="create"/>
             )}
           </div>
         </div>
