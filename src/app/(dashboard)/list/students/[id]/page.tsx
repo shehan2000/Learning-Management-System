@@ -1,13 +1,14 @@
 import Announcements from "@/components/Announcements";
 import BigCalendarContainer from "@/components/BigCalendarContainer";
-import BigCalendar from "@/components/BigCalender";
 import Performance from "@/components/Performance";
+import StudentAttendanceCard from "@/components/StudentAttendanceCard";
 import { prisma } from "@/lib/prisma";
 import { getUserRole } from "@/lib/utils";
 import { Class, Student } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 const SingleStudentPage = async ({params}: {params: {id: string}}) => {
   const student:(Student & { class: Class & { _count: { lessons: number } } }) | null= await prisma.student.findUnique({
@@ -72,10 +73,10 @@ const SingleStudentPage = async ({params}: {params: {id: string}}) => {
                 height={24}
                 className="w-6 h-6"
               />
-              <div className="">
-                <h1 className="text-xl font-semibold">90%</h1>
-                <span className="text-sm text-gray-400">Attendance</span>
-              </div>
+              <Suspense fallback={<div>Loading...</div>}>
+                <StudentAttendanceCard id={student.id} />
+              </Suspense>
+              
             </div>
             {/* CARD */}
             <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
