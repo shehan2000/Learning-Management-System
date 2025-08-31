@@ -21,7 +21,7 @@ const SingleTeacherPage = async({params}: {params: {id: string}}) => {
     }
   });
   if(!teacher) return notFound();
-  const role = await getUserRole(); // TODO: get user role from session
+  const role = await getUserRole(); 
   return (
     <div className="flex-1 p-4 flex flex-col gap-4 xl:flex-row">
       {/* LEFT */}
