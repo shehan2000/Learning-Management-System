@@ -521,14 +521,26 @@ export const createExam = async (
   currentState: CurrentState,
   data: ExamSchema
 ) => {
-  console.log(data.name + "in the server action");
+  const userId=await getUserId();
+  const role = await getUserRole();
   try {
-    await prisma.subject.create({
+    if(role==="teacher"){
+    const teacherLesson =await prisma.lesson.findFirst({
+      where:{
+        teacherId:userId!,
+        id:data.lessonId,
+      }
+    })
+    if(!teacherLesson){
+      return { success: false, error: true, message: "Unauthorized action" };
+    }
+  }
+    await prisma.exam.create({
       data: {
-        name: data.name,
-        teachers: {
-          connect: data.teachers.map((teacherId) => ({ id: teacherId })),
-        },
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
       },
     });
     // revalidatePath("/list/subjects")
@@ -542,17 +554,30 @@ export const updateExam = async (
   currentState: CurrentState,
   data: ExamSchema
 ) => {
-  console.log(data.name + "in the server action");
+  
+  const userId=await getUserId();
+  const role = await getUserRole();
   try {
+    if(role==="teacher"){
+    const teacherLesson =await prisma.lesson.findFirst({
+      where:{
+        teacherId:userId!,
+        id:data.lessonId,
+      }
+    })
+    if(!teacherLesson){
+      return { success: false, error: true, message: "Unauthorized action" };
+    }
+  }
     await prisma.exam.update({
       where: {
         id: data.id,
       },
       data: {
-        name: data.name,
-        teachers: {
-          set: data.teachers.map((teacherId) => ({ id: teacherId })),
-        },
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
       },
     });
     // revalidatePath("/list/subjects")

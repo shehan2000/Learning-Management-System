@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useFormState} from "react-dom"
 import InputField from "../InputField";
-import { ExamSchema, SubjectSchema, subjectSchema as schema } from "@/lib/formValidationSchemas";
+import { ExamSchema, examSchema as schema } from "@/lib/formValidationSchemas";
 import { createExam, createSubject, updateExam, updateSubject } from "@/lib/actions";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -68,7 +68,7 @@ const ExamForm = ({
         <InputField
           label="Start Date"
           name="startTime"
-          defaultValue={data?.startTime}
+          defaultValue={data?.startTime.toISOString().slice(0, 16)}
           register={register}
           error={errors?.startTime}
           type="datetime-local"
@@ -76,7 +76,7 @@ const ExamForm = ({
         <InputField
           label="End Date"
           name="endTime"
-          defaultValue={data?.endTime}
+          defaultValue={data?.endTime.toISOString().slice(0, 16)}
           register={register}
           error={errors?.endTime}
           type="datetime-local"
@@ -114,6 +114,7 @@ const ExamForm = ({
 
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}
+       
       </button>
     </form>
   );
