@@ -15,7 +15,6 @@ services:
 
 app:
   container_name: nextjs_app
-  image: nextjs:latest
   ports:
     - "3000:3000"
   environment:
