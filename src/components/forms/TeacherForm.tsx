@@ -68,7 +68,7 @@ const TeacherForm = ({
         setOpen(false);
         router.refresh();
       }
-    },[state])
+    },[state,router,type,setOpen])
 
     const subjects=relatedData?.subjects || [];
     // const {teachers}=relatedData;
