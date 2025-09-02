@@ -48,7 +48,7 @@ const ExamForm = ({
       setOpen(false);
       router.refresh();
     }
-  },[state])
+  },[state, router, setOpen, type])
 
   const {lessons}=relatedData;
   // const {teachers}=relatedData;
